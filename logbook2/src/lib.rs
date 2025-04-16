@@ -1,8 +1,17 @@
+//! Records observations in a logbook file, or lists previous observations.
+
 use std::{fs::{self, File}, path::Path};
 use std::io::Write;
 
 use anyhow::Result;
 
+/// Reads the contents of the logbook file at `path`.
+///
+/// Returns [`None`] if the file does not exist or is empty.
+///
+/// # Errors
+///
+/// Returns any error from [`fs::exists`] or [`fs::read_to_string`].
 pub fn read(path: impl AsRef<Path>) -> Result<Option<String>> {
     if fs::exists(&path)? {
         let content = fs::read_to_string(&path)?;
@@ -17,6 +26,13 @@ pub fn read(path: impl AsRef<Path>) -> Result<Option<String>> {
     }
 }
 
+/// Appends `msg` to the logbook file at `path`, creating the file
+/// if necessary.
+///
+/// # Errors
+///
+/// Returns any error from [`open`](fs::OpenOptions::open) or
+/// [`writeln!`].
 pub fn append(path: impl AsRef<Path>, message: &str) -> Result<()> {
     let mut logbook = File::options()
         .create(true)
