@@ -9,8 +9,8 @@ pub fn open(path: impl AsRef<Path>) -> Result<Vec<String>> {
     }
 }
 
-pub fn sync(memos: &[String], path: impl AsRef<Path>) -> anyhow::Result<()> {
-    Ok(())
+pub fn sync(memos: &[String], path: impl AsRef<Path>) -> Result<()> {
+    fs::write(&path, memos.join("\n"))
 }
 
 #[cfg(test)]
@@ -35,5 +35,26 @@ mod tests {
         let memos = open(&path).unwrap();
 
         assert_eq!(memos, vec!["foo", "bar"]);
+    }
+
+    #[test]
+    fn sync_creates_file_if_it_does_not_exist() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("new.txt");
+        let memos = vec!["hello".to_string(), "world".to_string()];
+        sync(&memos, &path).unwrap();
+
+        assert_eq!(open(&path).unwrap(), vec!["hello", "world"]);
+    }
+
+    #[test]
+    fn sync_overwrites_existing_file() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("existing.txt");
+        fs::write(&path, "foo\nbar").unwrap();
+        let new_memos = vec!["hola".to_string(), "mundo".to_string()];
+        sync(&new_memos, &path).unwrap();
+
+        assert_eq!(open(&path).unwrap(), vec!["hola", "mundo"]);
     }
 }
