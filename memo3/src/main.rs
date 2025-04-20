@@ -9,7 +9,7 @@ fn main() -> anyhow::Result<()> {
 
     if args.is_empty() {
         for memo in &memos.inner {
-            println!("{memo:?}");
+            println!("{memo}");
         }
     } else {
         let text = args.join(" ");

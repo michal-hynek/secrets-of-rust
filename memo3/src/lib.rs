@@ -1,4 +1,5 @@
 use std::{fs::{self, File}, io::{BufReader, BufWriter, Result}, path::{Path, PathBuf}};
+use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 
@@ -18,6 +19,21 @@ pub struct Memo {
 pub enum Status {
     Done,
     Pending,
+}
+
+impl Display for Memo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {}", self.status, self.text)
+    }
+}
+
+impl Display for Status {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            Status::Pending => "-",
+            Status::Done => "x",
+        })
+    }
 }
 
 impl Memos {
