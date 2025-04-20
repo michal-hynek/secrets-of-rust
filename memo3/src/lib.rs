@@ -56,6 +56,13 @@ impl Memos {
         serde_json::to_writer(BufWriter::new(file), &self.inner)?;
         Ok(())
     }
+
+    pub fn find_all(&mut self, text: &str) -> Vec<&mut Memo> {
+        self.inner
+            .iter_mut()
+            .filter(|m| m.text.contains(text))
+            .collect()
+    }
 }
 
 #[cfg(test)]
@@ -147,5 +154,22 @@ mod tests {
                 status: Status::Pending,
             }
         ]);
+    }
+
+    #[test]
+    fn find_all_returns_all_matching_memos() {
+        let mut memos = Memos {
+            path: PathBuf::from("dummy.json"),
+            inner: vec![
+                Memo{ text: "buy milk".to_string(), status: Status::Pending },
+                Memo{ text: "go for a walk".to_string(), status: Status::Pending },
+                Memo{ text: "buy eggs".to_string(), status: Status::Pending },
+            ],
+        };
+
+        let matching_memos = memos.find_all("buy");
+        assert_eq!(matching_memos.len(), 2);
+        assert_eq!(matching_memos[0].text, "buy milk");
+        assert_eq!(matching_memos[1].text, "buy eggs");
     }
 }
