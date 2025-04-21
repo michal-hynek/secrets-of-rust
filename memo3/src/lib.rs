@@ -63,6 +63,10 @@ impl Memos {
             .filter(|m| m.text.contains(text))
             .collect()
     }
+
+    pub fn purge_done(&mut self) {
+        self.inner.retain(|memo| memo.status != Status::Done);
+    }
 }
 
 #[cfg(test)]
@@ -171,5 +175,23 @@ mod tests {
         assert_eq!(matching_memos.len(), 2);
         assert_eq!(matching_memos[0].text, "buy milk");
         assert_eq!(matching_memos[1].text, "buy eggs");
+    }
+
+    #[test]
+    fn purge_done_deletes_done_memos() {
+        let mut memos = Memos {
+            path: PathBuf::from("dummy.json"),
+            inner: vec![
+                Memo{ text: "buy milk".to_string(), status: Status::Pending },
+                Memo{ text: "go for a walk".to_string(), status: Status::Done },
+                Memo{ text: "go for a run".to_string(), status: Status::Done },
+            ],
+        };
+
+        memos.purge_done();
+
+        assert_eq!(memos.inner, vec![
+            Memo { text: "buy milk".to_string(), status: Status::Pending },
+        ]);
     }
 }

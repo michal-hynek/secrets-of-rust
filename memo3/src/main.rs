@@ -9,6 +9,11 @@ struct Args {
     /// Marks all matching memos as done
     #[arg(short, long)]
     done: bool,
+
+    /// Deletes all done memos
+    #[arg(short, long)]
+    purge: bool,
+
     /// Text of the memo to store or mark as done
     text: Vec<String>,
 }
@@ -24,6 +29,9 @@ fn main() -> anyhow::Result<()> {
             println!("Marked \"{}\" as done", m.text);
         }
 
+        memos.sync()?;
+    } else if args.purge {
+        memos.purge_done();
         memos.sync()?;
     } else if args.text.is_empty() {
         for memo in &memos.inner {
