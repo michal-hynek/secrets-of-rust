@@ -1,0 +1,59 @@
+{
+    "request": {
+        "type": "City",
+        "query": "Vancouver, Canada",
+        "language": "en",
+        "unit": "m"
+    },
+    "location": {
+        "name": "Vancouver",
+        "country": "Canada",
+        "region": "British Columbia",
+        "lat": "49.250",
+        "lon": "-123.133",
+        "timezone_id": "America\/Vancouver",
+        "localtime": "2025-04-25 07:58",
+        "localtime_epoch": 1745567880,
+        "utc_offset": "-7.0"
+    },
+    "current": {
+        "observation_time": "02:58 PM",
+        "temperature": 11.1,
+        "weather_code": 113,
+        "weather_icons": [
+            "https:\/\/cdn.worldweatheronline.com\/images\/wsymbols01_png_64\/wsymbol_0001_sunny.png"
+        ],
+        "weather_descriptions": [
+            "Sunny"
+        ],
+        "astro": {
+            "sunrise": "06:01 AM",
+            "sunset": "08:21 PM",
+            "moonrise": "05:00 AM",
+            "moonset": "05:58 PM",
+            "moon_phase": "Waning Crescent",
+            "moon_illumination": 11
+        },
+        "air_quality": {
+            "co": "384.8",
+            "no2": "15.725",
+            "o3": "114",
+            "so2": "10.36",
+            "pm2_5": "24.605",
+            "pm10": "39.775",
+            "us-epa-index": "2",
+            "gb-defra-index": "2"
+        },
+        "wind_speed": 4,
+        "wind_degree": 4,
+        "wind_dir": "N",
+        "pressure": 1013,
+        "precip": 0,
+        "humidity": 76,
+        "cloudcover": 0,
+        "feelslike": 12,
+        "uv_index": 0,
+        "visibility": 10,
+        "is_day": "yes"
+    }
+}
