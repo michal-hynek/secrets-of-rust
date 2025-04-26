@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use anyhow::{Context, Result};
 use reqwest::blocking::RequestBuilder;
 use serde_json::Value;
@@ -6,6 +7,12 @@ use serde_json::Value;
 pub struct Weather {
     temperature: f64,
     summary: String,
+}
+
+impl Display for Weather {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {:.1}ºC", self.summary, self.temperature)
+    }
 }
 
 pub fn get_weather(location: &str, api_key: &str) -> Result<Weather> {
