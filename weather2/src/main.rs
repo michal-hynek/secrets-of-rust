@@ -1,7 +1,6 @@
 use clap::Parser;
 use anyhow::Result;
-
-use weather::get_weather;
+use weather::Weatherstack;
 
 #[derive(Parser)]
 struct Args {
@@ -20,8 +19,9 @@ fn main() -> Result<()> {
 
     let api_key = args.api_key;
     let location = args.args.join(" ");
+    let ws = Weatherstack::new(&api_key);
 
-    let weather = get_weather(&location, &api_key)?;
+    let weather = ws.get_weather(&location)?;
     println!("{weather}");
 
     Ok(())
