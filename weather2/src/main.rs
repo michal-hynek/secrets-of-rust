@@ -4,12 +4,16 @@ use weather::Weatherstack;
 
 #[derive(Parser)]
 struct Args {
-    /// WeatherStack API key
     #[arg(short, long, env = "WEATHERSTACK_API_KEY", required = true)]
+    /// WeatherStack API key
     api_key: String,
 
-    /// Location
+    #[arg(short, long)]
+    /// Reports temperatures in Fahrenheit
+    fahrenheit: bool,
+
     #[arg(required = true)]
+    /// Location
     /// Example: "Vancouver, BC"
     args: Vec<String>,
 }
@@ -22,7 +26,12 @@ fn main() -> Result<()> {
     let ws = Weatherstack::new(&api_key);
 
     let weather = ws.get_weather(&location)?;
-    println!("{weather}");
+
+    if args.fahrenheit {
+        println!("{}", weather.into_fahrenheit());
+    } else {
+        println!("{weather}");
+    }
 
     Ok(())
 }

@@ -36,6 +36,14 @@ impl Display for Weather {
     }
 }
 
+impl Weather {
+    #[must_use]
+    pub fn into_fahrenheit(mut self) -> Self {
+        self.temperature = self.temperature * 1.8 + 32.0;
+        self
+    }
+}
+
 fn request(url: &str, location: &str, api_key: &str) -> RequestBuilder {
     reqwest::blocking::Client::new()
         .get(url)
@@ -122,5 +130,15 @@ mod tests {
             summary: "Sunny".into(),
             temperature: 11.1,
         });
+    }
+
+    #[test]
+    fn into_fahrenheit_converts_temperature_to_fahrenheit() {
+        let weather = Weather{
+            temperature: 10.0,
+            summary: "Cloudy".into(),
+        }.into_fahrenheit();
+
+        assert_eq!(weather.temperature, 50.0);
     }
 }
