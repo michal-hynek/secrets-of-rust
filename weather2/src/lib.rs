@@ -26,21 +26,33 @@ impl Weatherstack {
 
 #[derive(Debug, PartialEq)]
 pub struct Weather {
-    temperature: f64,
-    summary: String,
+    pub temperature: Temperature,
+    pub summary: String,
 }
 
 impl Display for Weather {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {:.1}ºC", self.summary, self.temperature)
+        write!(f, "{} {:.1}ºC", self.summary, self.temperature.as_celsius())
     }
 }
 
-impl Weather {
+#[derive(Debug, PartialEq)]
+pub struct Temperature(f64);
+
+impl Temperature {
     #[must_use]
-    pub fn into_fahrenheit(mut self) -> Self {
-        self.temperature = self.temperature * 1.8 + 32.0;
-        self
+    pub fn from_celsius(val: f64) -> Self {
+        Self(val)
+    }
+
+    #[must_use]
+    pub fn as_celsius(&self) -> f64 {
+        self.0
+    }
+
+    #[must_use]
+    pub fn as_fahrenheit(&self) -> f64 {
+        self.0 * 1.8 + 32.0
     }
 }
 
@@ -63,7 +75,7 @@ fn deserialize(json: &str) -> Result<Weather> {
         .to_string();
 
     Ok(Weather {
-        temperature,
+        temperature: Temperature::from_celsius(temperature),
         summary,
     })
 }
@@ -99,7 +111,7 @@ mod tests {
         let response = deserialize(&json).unwrap();
 
         assert_eq!(response, Weather{
-            temperature: 11.1,
+            temperature: Temperature::from_celsius(11.1),
             summary: "Sunny".into(),
         });
     }
@@ -128,17 +140,19 @@ mod tests {
 
         assert_eq!(weather.unwrap(), Weather {
             summary: "Sunny".into(),
-            temperature: 11.1,
+            temperature: Temperature::from_celsius(11.1),
         });
     }
 
     #[test]
-    fn into_fahrenheit_converts_temperature_to_fahrenheit() {
-        let weather = Weather{
-            temperature: 10.0,
-            summary: "Cloudy".into(),
-        }.into_fahrenheit();
+    fn temperature_can_be_expressed_as_celsius() {
+        let temperature = Temperature::from_celsius(10.0);
+        assert_eq!(temperature.as_celsius(), 10.0);
+    }
 
-        assert_eq!(weather.temperature, 50.0);
+    #[test]
+    fn temperature_can_be_expressed_as_fahrenheit() {
+        let temperature = Temperature::from_celsius(10.0);
+        assert_eq!(temperature.as_fahrenheit(), 50.0);
     }
 }

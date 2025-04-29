@@ -28,9 +28,9 @@ fn main() -> Result<()> {
     let weather = ws.get_weather(&location)?;
 
     if args.fahrenheit {
-        println!("{}", weather.into_fahrenheit());
+        println!("{} {}ºF", weather.summary, weather.temperature.as_fahrenheit());
     } else {
-        println!("{weather}");
+        println!("{} {}ºC", weather.summary, weather.temperature.as_celsius());
     }
 
     Ok(())
