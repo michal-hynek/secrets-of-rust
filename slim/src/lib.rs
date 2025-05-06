@@ -1,5 +1,5 @@
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Output};
 
 use anyhow::Result;
 use walkdir::WalkDir;
@@ -10,7 +10,7 @@ pub fn slim(path: impl AsRef<Path>) -> Result<String> {
     for target in manifests(path)? {
         let mut cmd = cargo_clean_cmd(&target)?;
         let cmd_output = cmd.output()?;
-        //output.push_str(&summary(target, &cmd_output));
+        output.push_str(&summary(target, &cmd_output));
     }
 
     Ok(output)
@@ -41,8 +41,18 @@ fn cargo_clean_cmd(path: impl AsRef<Path>) -> Result<Command> {
     Ok(cmd)
 }
 
+fn summary(target: impl AsRef<Path>, cmd_output: &Output) -> String {
+    format!(
+        "{}: {}",
+        target.as_ref().parent().unwrap().display(),
+        String::from_utf8_lossy(&cmd_output.stderr).trim_start(),
+    )
+}
+
 #[cfg(test)]
 mod tests {
+    use std::process::ExitStatus;
+
     use super::*;
 
     #[test]
@@ -68,6 +78,24 @@ mod tests {
         assert_eq!(
             cmd.get_args().collect::<Vec<_>>(),
             ["clean", "--manifest-path", "tests/data/proj_1/Cargo.toml"],
+        );
+    }
+
+    #[test]
+    fn summary_returns_output_for_target() {
+        let cmd_output = Output {
+            status: ExitStatus::default(),
+            stdout: Vec::new(),
+            stderr: String::from("    Removed 3 files, 1.2MiB total...\n").into_bytes(),
+        };
+        let summary_msg= summary(
+            PathBuf::from("tests/data/proj_1/Cargo.toml"),
+            &cmd_output,
+        );
+
+        assert_eq!(
+            summary_msg,
+            "tests/data/proj_1: Removed 3 files, 1.2MiB total...\n"
         );
     }
 
