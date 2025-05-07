@@ -4,16 +4,39 @@ use std::process::{Command, Output};
 use anyhow::Result;
 use walkdir::WalkDir;
 
-pub fn slim(path: impl AsRef<Path>) -> Result<String> {
-    let mut output = String::new();
+#[derive(Default)]
+pub struct Slimmer {
+    pub dry_run: bool,
+}
 
-    for target in manifests(path)? {
-        let mut cmd = cargo_clean_cmd(&target)?;
-        let cmd_output = cmd.output()?;
-        output.push_str(&summary(target, &cmd_output));
+impl Slimmer {
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
     }
 
-    Ok(output)
+    pub fn slim(&self, path: impl AsRef<Path>) -> Result<String> {
+        let mut output = String::new();
+
+        for target in manifests(path)? {
+            let mut cmd = self.cargo_clean_cmd(&target)?;
+            let cmd_output = cmd.output()?;
+            output.push_str(&summary(target, &cmd_output));
+        }
+
+        Ok(output)
+    }
+
+    fn cargo_clean_cmd(&self, path: impl AsRef<Path>) -> Result<Command> {
+        let mut cmd = Command::new("cargo");
+        cmd.args([
+            "clean",
+            "--manifest-path",
+            &path.as_ref().to_string_lossy(),
+        ]);
+        
+        Ok(cmd)
+    }
 }
 
 fn manifests(path: impl AsRef<Path>) -> Result<Vec<PathBuf>> {
@@ -28,17 +51,6 @@ fn manifests(path: impl AsRef<Path>) -> Result<Vec<PathBuf>> {
     }
 
     Ok(targets)
-}
-
-fn cargo_clean_cmd(path: impl AsRef<Path>) -> Result<Command> {
-    let mut cmd = Command::new("cargo");
-    cmd.args([
-        "clean",
-        "--manifest-path",
-        &path.as_ref().to_string_lossy(),
-    ]);
-    
-    Ok(cmd)
 }
 
 fn summary(target: impl AsRef<Path>, cmd_output: &Output) -> String {
@@ -72,7 +84,8 @@ mod tests {
 
     #[test]
     fn cargo_clean_cmd_returns_correct_command() {
-        let cmd = cargo_clean_cmd("tests/data/proj_1/Cargo.toml").unwrap();
+        let slimmer = Slimmer::new();
+        let cmd = slimmer.cargo_clean_cmd("tests/data/proj_1/Cargo.toml").unwrap();
 
         assert_eq!(cmd.get_program(), "cargo");
         assert_eq!(
@@ -98,5 +111,6 @@ mod tests {
             "tests/data/proj_1: Removed 3 files, 1.2MiB total...\n"
         );
     }
+
 
 }
