@@ -34,6 +34,10 @@ impl Slimmer {
             "--manifest-path",
             &path.as_ref().to_string_lossy(),
         ]);
+
+        if self.dry_run {
+            cmd.arg("--dry-run");
+        }
         
         Ok(cmd)
     }
@@ -92,6 +96,19 @@ mod tests {
             cmd.get_args().collect::<Vec<_>>(),
             ["clean", "--manifest-path", "tests/data/proj_1/Cargo.toml"],
         );
+    }
+
+    #[test]
+    fn cargo_clean_cmd_honours_dry_run_mode() {
+        let mut slimmer = Slimmer::new();
+        slimmer.dry_run = true;
+        let cmd = slimmer.cargo_clean_cmd("tests/data/proj_2/Cargo.toml").unwrap();
+
+        assert_eq!(cmd.get_program(), "cargo");
+        assert_eq!(
+            cmd.get_args().collect::<Vec<_>>(),
+            ["clean", "--manifest-path", "tests/data/proj_2/Cargo.toml", "--dry-run"],
+        )
     }
 
     #[test]
