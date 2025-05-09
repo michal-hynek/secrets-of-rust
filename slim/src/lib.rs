@@ -46,7 +46,10 @@ impl Slimmer {
 fn manifests(path: impl AsRef<Path>) -> Result<Vec<PathBuf>> {
     let mut targets = Vec::new();
 
-    for entry in WalkDir::new(path) {
+    for entry in WalkDir::new(path)
+        .into_iter()
+        .filter_entry(|e| !e.path().ends_with("target/package"))
+    {
         let entry = entry?;
 
         if entry.file_name() == "Cargo.toml" {
