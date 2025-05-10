@@ -7,8 +7,8 @@ use slim::Slimmer;
 /// Runs `cargo clean` recursively to save disk space by deleting build artifacts.
 struct Args {
     #[arg(default_value = ".")]
-    /// Path to search for Rust projects
-    path: String,
+    /// Paths to search for Rust projects
+    paths: Vec<String>,
 
     #[arg(long)]
     /// Dry run without deleting any files
@@ -23,8 +23,10 @@ fn main() -> Result<()> {
         slimmer.dry_run = true;
     }
 
-    let output = slimmer.slim(args.path)?;
-    print!("{output}");
+    for path in args.paths {
+        let output = slimmer.slim(path)?;
+        print!("{output}");
+    }
 
     Ok(())
 }
