@@ -7,3 +7,7 @@ edition = "2024"
 anyhow = "1.0.98"
 clap = { version = "4.5.37", features = ["derive"] }
 walkdir = "2.5.0"
+
+[[bin]]
+name = "cargo-slim"
+path = "src/main.rs"
